@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            cursor: none;
+        }
+
+        body{
+            box-sizing: border-box;
+            margin: 0;
+            background-color: #010101;
+            height: 100vh;
+            display: grid;
+            place-items: center;
+            position: relative;
+        }
+
+        #bouncing-ball{
+            border-bottom: 0;
+            box-shadow: inset 0 0 19px 0px #66FF66;
+            border-radius: 10px;
+        }
+
+        #button, #points{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: transparent;
+            color: #66FF66;
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 1rem;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            text-shadow: 0 0 4px #66FF66;
+        }
+
+        #points{
+            font-size: 5rem;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bouncing-ball" width="800" height="700"></canvas>
+    <span id="button">PRESS ENTER TO START</span>
+    <span id="points"></span>
+
+    <script>
+        let canvas;
+        let ctx;
+        let animation;
+        let width;
+        let height;
+
+        let ballRadius = 30;
+        let velocityX, velocityY;
+        const force = 15;
+        let x, y;
+
+        const plateHeight = 20;
+        let plateWidth;
+        let plateX;
+        let plateVelocity;
+        let points;
+
+        async function init(){
+            canvas = document.getElementById('bouncing-ball');
+            ctx = canvas.getContext("2d");
+
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = 'green';
+            ctx.fillStyle = '#66FF66';
+
+
+            width = canvas.width;
+            height = canvas.height;
+            plateWidth = 200;
+            plateX = Math.floor((width - plateWidth) / 2);
+            plateVelocity = 0;
+
+            points = 0;
+
+            [x, y] = [Math.floor(width / 2), height - ballRadius - plateHeight];
+            [velocityX, velocityY] = getRandomVelocities();
+
+            paintBall();
+            paintPlate();
+            paintPoints();
+            drawScanlines();
+
+            document.getElementById('points').style.visibility = 'hidden';
+            paintStartButton();
+        }
+
+        function drawScanlines() {
+            for (let y = 0; y < height; y += 4) {
+                ctx.save();
+                ctx.fillStyle = `rgba(0, 0, 0, 0.2)`;
+                if (Math.random() * height < 2){
+                    ctx.fillStyle = `rgba(0, 0, 0, 0.4)`;
+                }
+    
+                ctx.fillRect(0, y, width, 2);
+                ctx.restore();
+            }
+        }
+
+        function paintStartButton(){
+            let button = document.getElementById('button');
+            button.style.visibility = 'visible';
+
+            document.addEventListener('keypress', function start(e) {
+                if (e.key == 'Enter'){
+                    document.removeEventListener('keypress', start);
+                    document.body.requestFullscreen();
+                    startGamePlay();
+                }
+            });
+        }
+
+        function startGamePlay(){
+            button.style.visibility = 'hidden';
+            document.getElementById('points').style.visibility = 'visible';
+            registerArrowFunctions();
+            animation = window.requestAnimationFrame(draw);
+        }
+
+        function paintPoints(){
+            document.getElementById('points').innerHTML = points;
+        }
+
+        async function paintPlate(){
+            ctx.fillRect(plateX, height - plateHeight, plateWidth, plateHeight);
+        }
+
+        function plateKeyDownListener(e){
+            let key = e.key.toLowerCase();
+
+            switch(key){
+                case 'a':
+                    plateVelocity = -force;
+                    break;
+                case 'd':
+                    plateVelocity = force;
+                    break;
+            }
+        }
+
+        function plateKeyUpListener(e){
+            switch(e.key){
+                case 'a':
+                    if (plateVelocity == -force){
+                        plateVelocity = 0;
+                    }
+                    break;
+                case 'd':
+                    if (plateVelocity == force){
+                            plateVelocity = 0;
+                    }
+                    break;
+            }
+        }
+
+        async function registerArrowFunctions(){
+            document.addEventListener('keydown', plateKeyDownListener)
+            document.addEventListener('keyup', plateKeyUpListener)
+        }
+
+        async function draw(){
+            // ctx.globalCompositeOperation = "destination-over";
+            ctx.clearRect(0, 0, 800, 700);
+
+            updatePoints();
+
+            updatePosition();
+            if (y > height - ballRadius - plateHeight){
+                window.cancelAnimationFrame(animation);
+                gameOver();
+                return;
+            }
+
+            updateVelocity();
+
+            paintBall();
+            paintPlate();
+            paintPoints();
+
+            drawScanlines();
+
+            window.requestAnimationFrame(draw)
+        }
+
+        function updatePoints(){
+            if (y == height - plateHeight - ballRadius){
+                points++;
+            }
+        }
+
+        function getRandomVelocities(){
+            let velocityX = Math.floor(5 + Math.random() * 10);
+
+            if (Math.random() > 0.5){
+                velocityX = -velocityX;
+            }
+
+            return [velocityX, -15]
+        }
+
+        function updateVelocity(){
+            if (x >= width - ballRadius || x <= ballRadius){
+                velocityX = -velocityX;
+            }
+
+            if (y <= ballRadius){
+                velocityY = -velocityY;
+                return;
+            }
+
+            if (
+                y >= height - ballRadius - plateHeight && 
+                x >= plateX && x <= plateX + plateWidth
+            ){
+                velocityY = -velocityY;
+                velocityX += 0.1 * plateVelocity;
+            }
+        }
+
+        function updatePosition(){
+            x = Math.max(ballRadius, Math.min(x + velocityX, width - ballRadius));
+
+            //if it's going to hit the plate
+            if (x >= plateX && x <= plateX + plateWidth){
+                y = Math.max(ballRadius, Math.min(y + velocityY, height - ballRadius - plateHeight));
+            }
+            else{
+                y = Math.max(ballRadius, y + velocityY);
+            }
+
+            plateWidth = 200 - 5 * points;
+            plateX = Math.max(0, Math.min(plateX + plateVelocity, width - plateWidth))
+        }
+
+        function paintBall(){
+            ctx.beginPath();
+            ctx.arc(x, y, ballRadius, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+
+        function waitabit(){
+            return new Promise((resolve) => {
+                setTimeout(resolve, 30);
+            })
+        }
+
+        function gameOver(){
+            document.removeEventListener('keydown', plateKeyDownListener);
+            document.removeEventListener('keyup', plateKeyUpListener);
+            init();
+        }
+
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
