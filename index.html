@@ -39,6 +39,15 @@
             text-shadow: 0 0 4px #66FF66;
         }
 
+        #points.gameover{
+            color: #FF0000;
+            text-shadow: 0 0 4px #FF0000;
+        }
+
+        #bouncing-ball.gameover{
+            box-shadow: inset 0 0 19px 0px #FF0000;
+        }
+
         #points{
             font-size: 5rem;
         }
@@ -66,6 +75,8 @@
         let plateX;
         let plateVelocity;
         let points;
+        let over;
+        let started;
 
         async function init(){
             canvas = document.getElementById('bouncing-ball');
@@ -81,12 +92,18 @@
             plateWidth = 200;
             plateX = Math.floor((width - plateWidth) / 2);
             plateVelocity = 0;
+            
+            over = false;
+            started = false;
 
             points = 0;
 
             [x, y] = [Math.floor(width / 2), height - ballRadius - plateHeight];
             [velocityX, velocityY] = getRandomVelocities();
 
+            ctx.clearRect(0, 0, 800, 700);
+            document.getElementById('points').classList.remove('gameover');
+            canvas.classList.remove('gameover');
             paintBall();
             paintPlate();
             paintPoints();
@@ -127,14 +144,23 @@
             document.getElementById('points').style.visibility = 'visible';
             registerArrowFunctions();
             animation = window.requestAnimationFrame(draw);
+            started = true;
         }
 
         function paintPoints(){
+            if (over){
+                document.getElementById('points').classList.add('gameover');
+            }
             document.getElementById('points').innerHTML = points;
         }
 
         async function paintPlate(){
+            ctx.save();
+            if (over){
+                ctx.fillStyle = '#ff0000';
+            }
             ctx.fillRect(plateX, height - plateHeight, plateWidth, plateHeight);
+            ctx.restore();
         }
 
         function plateKeyDownListener(e){
@@ -171,7 +197,6 @@
         }
 
         async function draw(){
-            // ctx.globalCompositeOperation = "destination-over";
             ctx.clearRect(0, 0, 800, 700);
 
             updatePoints();
@@ -195,7 +220,7 @@
         }
 
         function updatePoints(){
-            if (y == height - plateHeight - ballRadius){
+            if (started && y == height - plateHeight - ballRadius){
                 points++;
             }
         }
@@ -233,7 +258,7 @@
             x = Math.max(ballRadius, Math.min(x + velocityX, width - ballRadius));
 
             //if it's going to hit the plate
-            if (x >= plateX && x <= plateX + plateWidth){
+            if (x + ballRadius/2 >= plateX && x - ballRadius/2 <= plateX + plateWidth){
                 y = Math.max(ballRadius, Math.min(y + velocityY, height - ballRadius - plateHeight));
             }
             else{
@@ -245,9 +270,14 @@
         }
 
         function paintBall(){
+            ctx.save();
+            if (over){
+                ctx.fillStyle = '#ff0000';
+            }
             ctx.beginPath();
             ctx.arc(x, y, ballRadius, 0, 2 * Math.PI);
             ctx.fill();
+            ctx.restore();
         }
 
         function waitabit(){
@@ -256,10 +286,27 @@
             })
         }
 
+        function drawGameOver(){
+            ctx.clearRect(0, 0, 800, 700);
+            canvas.classList.add('gameover');
+            paintBall();
+            paintPlate();
+            paintPoints();
+            drawScanlines();
+        }
+
         function gameOver(){
             document.removeEventListener('keydown', plateKeyDownListener);
             document.removeEventListener('keyup', plateKeyUpListener);
-            init();
+            over = true;
+            started = false;
+
+            window.requestAnimationFrame(drawGameOver);
+
+            document.addEventListener('keypress', function restart(){
+                document.removeEventListener('keypress', restart);
+                init();
+            });
         }
 
         window.addEventListener('load', init);
