@@ -83,7 +83,7 @@
             ctx = canvas.getContext("2d");
 
             ctx.shadowBlur = 10;
-            ctx.shadowColor = 'green';
+            ctx.shadowColor = '#66FF66';
             ctx.fillStyle = '#66FF66';
 
 
@@ -157,7 +157,8 @@
         async function paintPlate(){
             ctx.save();
             if (over){
-                ctx.fillStyle = '#ff0000';
+                ctx.shadowColor = '#FF0000';
+                ctx.fillStyle = '#FF0000';
             }
             ctx.fillRect(plateX, height - plateHeight, plateWidth, plateHeight);
             ctx.restore();
@@ -272,7 +273,8 @@
         function paintBall(){
             ctx.save();
             if (over){
-                ctx.fillStyle = '#ff0000';
+                ctx.shadowColor = '#FF0000';
+                ctx.fillStyle = '#FF0000';
             }
             ctx.beginPath();
             ctx.arc(x, y, ballRadius, 0, 2 * Math.PI);
@@ -303,9 +305,11 @@
 
             window.requestAnimationFrame(drawGameOver);
 
-            document.addEventListener('keypress', function restart(){
-                document.removeEventListener('keypress', restart);
-                init();
+            document.addEventListener('keypress', function restart(e){
+                if (e.key == 'Enter'){
+                    document.removeEventListener('keypress', restart);
+                    init();
+                }
             });
         }
 
