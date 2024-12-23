@@ -29,6 +29,10 @@ class PlateCanvas extends Canvas {
         this._draw();
     }
 
+    move = (clientX) => {
+        this.x = Math.max(0, Math.min(clientX - this.plateWidth / 2, this.width - this.plateWidth))
+    }
+
     _draw = (time) => {
         if (time !== undefined){
             this.animation = window.requestAnimationFrame(this._draw);

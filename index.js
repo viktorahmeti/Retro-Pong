@@ -97,8 +97,11 @@ class Game{
             });
 
             this.gameContainer.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                this.plate.x = e.targetTouches[0].clientX;
+                if (this.state !== 'playing'){
+                    return;
+                }
+
+                this.plate.move(e.targetTouches[0].clientX)
                 this.plate.animation = window.requestAnimationFrame(this.plate._draw);
             });
 
@@ -108,17 +111,21 @@ class Game{
                     return;
                 }
 
-                this.plate.x = e.targetTouches[0].clientX;
+                this.plate.move(e.targetTouches[0].clientX)
                 this.plate.animation = window.requestAnimationFrame(this.plate._draw);
             });
 
             this.gameContainer.addEventListener('touchend', (e) => {
-                e.preventDefault();
+                if (this.state !== 'playing'){
+                    return;
+                }
                 window.cancelAnimationFrame(this.plate.animation);
             });
 
             this.gameContainer.addEventListener('touchcancel', (e) => {
-                e.preventDefault();
+                if (this.state !== 'playing'){
+                    return;
+                }
                 window.cancelAnimationFrame(this.plate.animation);
             });
         }
