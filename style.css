@@ -1,0 +1,40 @@
+*{
+    cursor: none;
+    box-sizing: border-box;
+}
+
+html {
+    min-height: calc(100% + env(safe-area-inset-top));
+    background-color: #010101;
+}
+
+body {
+    position: absolute;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    inset: 0;
+    margin: 0;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+}
+
+#game-container{
+    position: absolute;
+    inset: 0;
+}
+
+#game-container canvas{
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#background{
+    border-bottom: 0;
+    box-shadow: inset 0 0 19px 0px #66FF66;
+    border-radius: 10px;
+}
+
+#background.gameover{
+    box-shadow: inset 0 0 19px 0px #FF0000;
+}
