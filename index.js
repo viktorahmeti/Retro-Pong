@@ -59,17 +59,15 @@ class Game{
                 return;
             }
 
-            switch(e.keyCode){
-                case 37:
-                    if (this.plate.velocity == -this.plate.sensitivity){
-                        this.plate.velocity = 0;
-                    }
-                    break;
-                case 39:
-                    if (this.plate.velocity == this.plate.sensitivity){
-                            this.plate.velocity = 0;
-                    }
-                    break;
+            if (e.key == 'a' || e.keyCode == 37){
+                if (this.plate.velocity == -this.plate.sensitivity){
+                    this.plate.velocity = 0;
+                }
+            }
+            else if(e.key == 'd' || e.keyCode == 39){
+                if (this.plate.velocity == this.plate.sensitivity){
+                    this.plate.velocity = 0;
+                }
             }
 
             window.cancelAnimationFrame(this.plate.animation);
