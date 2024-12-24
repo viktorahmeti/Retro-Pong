@@ -39,7 +39,7 @@ class BouncingBallCanvas extends Canvas {
     }
 
     _draw = (time) => {
-        if (time !== undefined){
+        if (!this.animation && time !== undefined){
             this.animation = window.requestAnimationFrame(this._draw);
         }
         else{
@@ -78,6 +78,7 @@ class BouncingBallCanvas extends Canvas {
     
             if (this.y > this.height - this.radius - this.plate.hoverHeight - this.plate.plateHeight){
                 window.cancelAnimationFrame(this.animation);
+                this.animation = null;
                 this.gameOverCallback();
                 return;
             }
