@@ -39,7 +39,7 @@ class BouncingBallCanvas extends Canvas {
     }
 
     _draw = (time) => {
-        if (!this.animation && time !== undefined){
+        if (time !== undefined){
             this.animation = window.requestAnimationFrame(this._draw);
         }
         else{
