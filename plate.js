@@ -7,6 +7,7 @@ class PlateCanvas extends Canvas {
     x;
     sensitivity = 15;
     background;
+    prevTime;
 
     constructor(background){
         super('plate');
@@ -23,23 +24,50 @@ class PlateCanvas extends Canvas {
         else{
             this.hoverHeight = 32;
         }
-        this.defaultPlateWidth = Math.max(30, Math.min(200, this.width / 3));
+        this.defaultPlateWidth = Math.max(30, Math.min(200, this.width / 4));
         this.plateWidth = this.defaultPlateWidth;
+        this.sensitivity = this.width * this.fps / 1000;
+
         this.x = Math.floor((this.width - this.plateWidth) / 2);
         this._draw();
+    }
+
+    updateState(newState){
+        super.updateState(newState);
+
+        if (this.state == 'game_over'){
+            window.cancelAnimationFrame(this.animation);
+        }
+    }
+
+    _shineContext = () => {
+        this.ctx.shadowColor = '#CCFFCC';
+        this.ctx.fillStyle = '#CCFFCC';
     }
 
     move = (clientX) => {
         this.x = Math.max(0, Math.min(clientX - this.plateWidth / 2, this.width - this.plateWidth))
     }
 
+    shine = () => {
+        this._shineContext();
+
+        setTimeout(this._greenContext, 250);
+    }
+
+    _redraw = () => {
+        this.ctx.clearRect(0, 0, this.width, this.height);
+        this._drawPlate();
+    }
+
     _draw = (time) => {
-        if (time !== undefined){
+        if (this.state == 'playing')
             this.animation = window.requestAnimationFrame(this._draw);
-        }
-        else{
-            window.cancelAnimationFrame(this.animation);
-        }
+
+        if (time - this.prevFrameTime < this.fps)
+            return;
+
+        this.prevFrameTime = time;
 
         this.ctx.clearRect(0, 0, this.width, this.height);
 

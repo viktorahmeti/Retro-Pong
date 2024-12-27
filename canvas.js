@@ -11,7 +11,11 @@ class Canvas{
         this.animation = null;
         this.width = this.canvas.width;
         this.height = this.canvas.height;
-        this.ctx.shadowBlur = 10;
+        this.fps = Math.floor(1000 / 60);
+
+        this.blurSize = 10;
+
+        this.ctx.shadowBlur = this.blurSize;
         this._greenContext();
         this.ctx.font = "bold 80px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif";
         this.state = 'before_play';
@@ -29,7 +33,7 @@ class Canvas{
                 this._greenContext();
         }
 
-        this._draw();
+        this._redraw();
     }
 
     _greenContext = () => {

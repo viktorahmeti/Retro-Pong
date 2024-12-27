@@ -21,6 +21,10 @@ class BackgroundCanvas extends Canvas {
         }
     }
 
+    _redraw = () => {
+        this._draw();
+    }
+
     _draw = (time) => {
         this.ctx.clearRect(0, 0, this.width, this.height);
 
