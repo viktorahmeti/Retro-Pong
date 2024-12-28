@@ -1,6 +1,7 @@
 import BackgroundCanvas from './background.js';
 import PlateCanvas from './plate.js';
 import BouncingBallCanvas from './ball.js';
+import audio from './audio.js';
 
 class Game{
     state = 'before_play';
@@ -74,7 +75,7 @@ class Game{
         });
 
         if (window.isTouch){
-            this.gameContainer.addEventListener('touchstart', (e) => {
+            this.gameContainer.addEventListener('click', (e) => {
                 if (this.state != 'before_play'){
                     return;
                 }
@@ -82,7 +83,7 @@ class Game{
                 this.updateState('playing');
             });
 
-            this.gameContainer.addEventListener('touchstart', (e) => {
+            this.gameContainer.addEventListener('click', (e) => {
                 if (this.state != 'game_over'){
                     return;
                 }
@@ -143,7 +144,7 @@ class Game{
 
     onGameOver = () => {
         this.updateState('game_over');
-        //more code here
+        audio.updateSong();
     }
 }
 
@@ -152,32 +153,3 @@ window.isTouch = (('ontouchstart' in window) ||
 (navigator.msMaxTouchPoints > 0));
 
 window.addEventListener('load', () => new Game());
-
-const audioContext = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' });
-
-window.beep = () => {
-    if (audioContext.state === 'suspended') {
-        audioContext.resume();
-    }
-
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-
-    // Connect the nodes
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-
-    // Use a square wave for a retro feel
-    oscillator.type = 'square';
-
-    // Set the frequency (adjust for different pitches)
-    oscillator.frequency.setValueAtTime(880, audioContext.currentTime); // A5 note
-
-    // Control the volume
-    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime); // Start volume
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2); // Fade out
-
-    // Start and stop the oscillator
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.2);
-}

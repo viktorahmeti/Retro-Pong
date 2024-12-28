@@ -80,9 +80,9 @@ class BackgroundCanvas extends Canvas {
         for (let y = 0; y < this.height; y += 4) {
             this.ctx.save();
             this.ctx.fillStyle = `rgba(0, 0, 0, 0.2)`;
-            this.ctx.shadowBlur = 2;
+            this.ctx.shadowBlur = 5;
             if (Math.random() * this.height < 5){
-                this.ctx.fillStyle = `rgba(0, 0, 0, 0.3)`;
+                this.ctx.fillStyle = `rgba(0, 0, 0, 0.5)`;
             }
 
             this.ctx.fillRect(0, y, this.width, 2);

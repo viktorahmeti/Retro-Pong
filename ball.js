@@ -1,4 +1,5 @@
 import Canvas from './canvas.js';
+import audio from './audio.js';
 
 class BouncingBallCanvas extends Canvas {
     //reference framerate is 60fps
@@ -68,12 +69,12 @@ class BouncingBallCanvas extends Canvas {
 
         if (this.x >= this.width - this.radius || this.x <= this.radius){
             this.velocityX = -this.velocityX;
-            window.beep();
+            audio.beep();
         }
 
         if (this.y <= this.radius){
             this.velocityY = -this.velocityY;
-            window.beep();
+            audio.beep();
             return;
         }
 
@@ -83,7 +84,7 @@ class BouncingBallCanvas extends Canvas {
         ){
             this.velocityY = -this.velocityY;
             this.velocityX += 0.1 * this.plate.velocity;
-            window.beep();
+            audio.beep();
         }
 
         if (this.y > this.height - this.radius - this.plate.hoverHeight - this.plate.plateHeight){
@@ -95,7 +96,7 @@ class BouncingBallCanvas extends Canvas {
 
         if (this.y == this.height - this.radius - this.plate.hoverHeight - this.plate.plateHeight){
             this.onPoint();
-            window.beep();
+            // audio.beep();
         }
 
         this._drawBall();
