@@ -83,7 +83,7 @@ class Game{
                 this.updateState('playing');
             });
 
-            this.gameContainer.addEventListener('click', (e) => {
+            this.gameContainer.addEventListener('touchstart', (e) => {
                 if (this.state != 'game_over'){
                     return;
                 }
